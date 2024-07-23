@@ -1,7 +1,3 @@
-```
-
-```
-
 # R3Design
 
 ## Introduction
@@ -17,8 +13,6 @@ R3Design
 ├── RoseTTAFold2NA
 |-- RNAFold
 ├── environment files
-
-
 ```
 For R3Design Model, we mainly use `R3Design/manul_input` folder for producing results.
 ## Environment Setup 
