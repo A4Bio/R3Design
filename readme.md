@@ -133,7 +133,7 @@ python system_pipeline.py <'path to PDB file'>
 ## Example: 
 ## python sequence_generation.py '/root/a.pdb'
 ```
-### The logfile could be found at `R3Design/manul_input/full_result`. The logfile is `log.txt`, the predicted PDB file is inside the `RNA_name_pred` folder `eg: native_pred`.
+The logfile could be found at `R3Design/manul_input/full_result`. The logfile is `log.txt`, the predicted PDB file is inside the `RNA_name_pred` folder `eg: native_pred`.
 
 
 ## License
