@@ -1,0 +1,16 @@
+__pycache__
+.vscode
+*.log
+*.tar.gz
+
+ckpt_path_backup/
+results_backup/
+results/
+other_files/
+compress_files/
+
+R3Design/manul_input/full_result/
+
+RoseTTAFold2NA/
+RNAFold/
+moderna/

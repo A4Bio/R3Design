@@ -1,0 +1,29 @@
+name: RF2NA
+channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/pytorch/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/
+  - pytorch
+  - nvidia
+  - defaults
+  - conda-forge
+  - dglteam
+dependencies:
+  - python=3.10
+  - dgl
+  - pip
+  - pytorch
+  - requests
+  - pytorch-cuda=12.1
+  - ZSTD
+  - pyg::pyg 
+  - bioconda::mafft
+  - bioconda::hhsuite
+  - bioconda::blast
+  - bioconda::hmmer>=3.3
+  - bioconda::infernal
+  - bioconda::cd-hit
+  - bioconda::csblast
+  - pip:
+    - psutil
+    - tqdm
