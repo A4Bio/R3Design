@@ -60,10 +60,10 @@ class Exp:
         with open(sv_param, 'w') as file_obj:
             json.dump(self.args.__dict__, file_obj)
 
-        for handler in logging.root.handlers[:]:
-            logging.root.removeHandler(handler)
-        logging.basicConfig(level=logging.INFO, filename=osp.join(self.path, 'log.log'),
-                            filemode='a', format='%(asctime)s - %(message)s')
+        # for handler in logging.root.handlers[:]:
+        #     logging.root.removeHandler(handler)
+        # logging.basicConfig(level=logging.INFO, filename=osp.join(self.path, 'log.log'),
+        #                     filemode='a', format='%(asctime)s - %(message)s')
         # prepare data
         # self._get_data()
         # build the method
