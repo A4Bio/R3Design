@@ -7,3 +7,5 @@ tmp/
 wandb/
 */test.ipynb
 fasta_pred/
+dataset/
+manul_input/

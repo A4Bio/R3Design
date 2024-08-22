@@ -213,7 +213,8 @@ class RNAFeatures(nn.Module):
         for pair in node_list:
             atom1, atom2 = pair.split('-')
             V_dist.append(node_mask_select(self._get_rbf(vars()['atom_' + atom1], vars()['atom_' + atom2], None, self.num_rbf).squeeze()))
-        V_dist = torch.cat(tuple(V_dist), dim=-1).squeeze()
+        # V_dist = torch.cat(tuple(V_dist), dim=-1).squeeze()
+        V_dist = torch.cat(tuple(V_dist), dim=-1)
         # direction
         V_direct, E_direct, E_orient = self._orientations_coarse(X, E_idx)
         V_direct = node_mask_select(V_direct)

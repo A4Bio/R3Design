@@ -7,7 +7,7 @@ from .utils import cuda, loss_nll_flatten
 from models import R3Design_Model
 import torch.nn.functional as F
 from sklearn.metrics import precision_recall_fscore_support
-
+from .loss_ntxent import NTXentLoss
 
 alphabet = 'AUCG'
 pre_base_pairs = {0: 1, 1: 0, 2: 3, 3: 2}
@@ -18,7 +18,9 @@ class R3Design(Base_method):
         Base_method.__init__(self, args, device, steps_per_epoch)
         self.model = self._build_model()
         self.criterion = torch.nn.CrossEntropyLoss()
-
+        self.optimizer, self.scheduler = self._init_optimizer(steps_per_epoch)
+        self.ntxent = NTXentLoss(device, temperature=0.5, use_cosine_similarity=True)
+        
     def _build_model(self):
         return R3Design_Model(self.args).to(self.device)
 
@@ -76,57 +78,58 @@ class R3Design(Base_method):
         train_pbar = tqdm(train_loader)
         for batch in train_pbar:
             self.optimizer.zero_grad()
-            X, aug_Xs, aug_idxs, aug_tms, aug_rms, oriS, mask, lengths, clus, ss_pos, names = batch
+            X, oriS, mask, lengths, clus, ss_pos, ss_pair, names = batch
+            # X, aug_Xs, aug_idxs, aug_tms, aug_rms, oriS, mask, lengths, clus, ss_pos, names = batch
             X, oriS, mask, lengths, clus, ss_pos = cuda((X, oriS, mask, lengths, clus, ss_pos), device=self.device)
             
             logits_lst, S, graph_prjs = self.model(X, oriS, mask)
             logits = logits_lst[-1]
 
-            # cluster-level contrastive learning
-            uni_clus = torch.unique(clus)
-            nidxs = torch.zeros_like(clus)
-            for c_idx in uni_clus:
-                idxs = torch.where(clus == c_idx)[0]
-                nidxs[idxs] = idxs[torch.randperm(len(idxs))]
-            iidxs = torch.range(0, graph_prjs.shape[0]-1).long()
-            iis = [ii for ii, _ in enumerate(nidxs) if nidxs[ii] != iidxs[ii]]
-            loss_clu_con = self.ntxent(graph_prjs[iis], graph_prjs[nidxs[iis]])
+            # # cluster-level contrastive learning
+            # uni_clus = torch.unique(clus)
+            # nidxs = torch.zeros_like(clus)
+            # for c_idx in uni_clus:
+            #     idxs = torch.where(clus == c_idx)[0]
+            #     nidxs[idxs] = idxs[torch.randperm(len(idxs))]
+            # iidxs = torch.range(0, graph_prjs.shape[0]-1).long()
+            # iis = [ii for ii, _ in enumerate(nidxs) if nidxs[ii] != iidxs[ii]]
+            # loss_clu_con = self.ntxent(graph_prjs[iis], graph_prjs[nidxs[iis]])
 
-            # sample-level contrastive learning
-            # select one from augmented data
-            aug_sid = [random.choice(range(len(aug_x))) if len(aug_x) > 0 else None for aug_x in aug_Xs]
-            aug_Xs = [cuda(aug_x[aug_sid[aug_i]], device=self.device) for aug_i, aug_x in enumerate(aug_Xs) if aug_sid[aug_i] != None]
-            aug_tms = [aug_tm[aug_sid[aug_i]] for aug_i, aug_tm in enumerate(aug_tms) if aug_sid[aug_i] != None]
-            aug_rms = [aug_rm[aug_sid[aug_i]] for aug_i, aug_rm in enumerate(aug_rms) if aug_sid[aug_i] != None]
-            aug_Xs = torch.stack(aug_Xs, dim=0)
-            aug_logits_lst, aug_S, aug_graph_prjs = self.model(aug_Xs, oriS[aug_idxs], mask[aug_idxs])
-            aug_logits = aug_logits_lst[-1]
+            # # sample-level contrastive learning
+            # # select one from augmented data
+            # aug_sid = [random.choice(range(len(aug_x))) if len(aug_x) > 0 else None for aug_x in aug_Xs]
+            # aug_Xs = [cuda(aug_x[aug_sid[aug_i]], device=self.device) for aug_i, aug_x in enumerate(aug_Xs) if aug_sid[aug_i] != None]
+            # aug_tms = [aug_tm[aug_sid[aug_i]] for aug_i, aug_tm in enumerate(aug_tms) if aug_sid[aug_i] != None]
+            # aug_rms = [aug_rm[aug_sid[aug_i]] for aug_i, aug_rm in enumerate(aug_rms) if aug_sid[aug_i] != None]
+            # aug_Xs = torch.stack(aug_Xs, dim=0)
+            # aug_logits_lst, aug_S, aug_graph_prjs = self.model(aug_Xs, oriS[aug_idxs], mask[aug_idxs])
+            # aug_logits = aug_logits_lst[-1]
 
-            loss_sam_con = self.ntxent(aug_graph_prjs, graph_prjs[aug_idxs])
-            if self.args.conf_case == 0:
-                loss_sam_con = loss_sam_con
-            elif self.args.conf_case == 1:
-                loss_sam_con = loss_sam_con * torch.exp(-torch.tensor(aug_rms + aug_rms, device=self.device))
-            elif self.args.conf_case == 2:
-                loss_sam_con = loss_sam_con * torch.exp(torch.tensor(aug_tms + aug_tms, device=self.device) - 1)
-            elif self.args.conf_case == 3:
-                loss_sam_con = loss_sam_con * (torch.exp(torch.tensor(aug_tms + aug_tms, device=self.device) - 1) + torch.exp(-torch.tensor(aug_rms + aug_rms, device=self.device)))
-            loss_sam_con = loss_sam_con.mean()
+            # loss_sam_con = self.ntxent(aug_graph_prjs, graph_prjs[aug_idxs])
+            # if self.args.conf_case == 0:
+            #     loss_sam_con = loss_sam_con
+            # elif self.args.conf_case == 1:
+            #     loss_sam_con = loss_sam_con * torch.exp(-torch.tensor(aug_rms + aug_rms, device=self.device))
+            # elif self.args.conf_case == 2:
+            #     loss_sam_con = loss_sam_con * torch.exp(torch.tensor(aug_tms + aug_tms, device=self.device) - 1)
+            # elif self.args.conf_case == 3:
+            #     loss_sam_con = loss_sam_con * (torch.exp(torch.tensor(aug_tms + aug_tms, device=self.device) - 1) + torch.exp(-torch.tensor(aug_rms + aug_rms, device=self.device)))
+            # loss_sam_con = loss_sam_con.mean()
                 
-            # secondary ss
+            # # secondary ss
             if self.args.ss_case == 0:
                 basic_loss = 0.
                 for cur_logit in logits_lst:
                     basic_loss = basic_loss + self.criterion(cur_logit, S).mean()
-            elif self.args.ss_case == 1:
-                ss_pos = ss_pos[mask == 1].bool()
-                basic_loss = (self.criterion(logits[~ss_pos], S[~ss_pos]) + self.criterion(logits[ss_pos] / self.args.ss_temp, S[ss_pos])) / 2.0
+            # elif self.args.ss_case == 1:
+            #     ss_pos = ss_pos[mask == 1].bool()
+            #     basic_loss = (self.criterion(logits[~ss_pos], S[~ss_pos]) + self.criterion(logits[ss_pos] / self.args.ss_temp, S[ss_pos])) / 2.0
             
-            if self.args.aug_log_case == 0:
-                loss = basic_loss + loss_clu_con * self.args.weigth_clu_con + loss_sam_con * self.args.weigth_sam_con
-            elif self.args.aug_log_case == 1:
-                loss = (basic_loss + self.criterion(aug_logits, aug_S)) / (1 + len(aug_logits) / len(logits)) + loss_clu_con * self.args.weigth_clu_con + loss_sam_con * self.args.weigth_sam_con
-            
+            # if self.args.aug_log_case == 0:
+            #     loss = basic_loss + loss_clu_con * self.args.weigth_clu_con + loss_sam_con * self.args.weigth_sam_con
+            # elif self.args.aug_log_case == 1:
+            #     loss = (basic_loss + self.criterion(aug_logits, aug_S)) / (1 + len(aug_logits) / len(logits)) + loss_clu_con * self.args.weigth_clu_con + loss_sam_con * self.args.weigth_sam_con
+            loss = basic_loss
             loss.backward()
         
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1)

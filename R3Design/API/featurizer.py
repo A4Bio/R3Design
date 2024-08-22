@@ -88,7 +88,7 @@ def featurize_HC(batch):
     lengths = np.array([len(b['seq']) for b in batch], dtype=np.int32)
     L_max = max([len(b['seq']) for b in batch])
     # print(L_max)
-    # L_max = 2000
+    L_max = 1000
     X = np.zeros([B, L_max, 6, 3])
     S = np.zeros([B, L_max], dtype=np.int32)
     clus = np.zeros([B], dtype=np.int32)
@@ -102,16 +102,20 @@ def featurize_HC(batch):
         x = np.stack([b['coords'][c] for c in ['P', 'O5\'', 'C5\'', 'C4\'', 'C3\'', 'O3\'']], 1)
         
         l = len(b['seq'])
+        # if L_max < l:
+        #     # 截断处理
+        #     x = x[:L_max, :, :]
+        #     l = L_max 
         x_pad = np.pad(x, [[0, L_max-l], [0,0], [0,0]], 'constant', constant_values=(np.nan, ))
         X[i,:,:,:] = x_pad
 
         indices = np.asarray([alphabet.index(a) for a in b['seq']], dtype=np.int32)
         S[i, :l] = indices
-        ss_pos[i, :l] = np.asarray([1 if ss_val!='.' else 0 for ss_val in b['ss']], dtype=np.int32)
-        ss_pair.append(find_bracket_pairs(b['ss'], b['seq']))
+        # ss_pos[i, :l] = np.asarray([1 if ss_val!='.' else 0 for ss_val in b['ss']], dtype=np.int32)
+        # ss_pair.append(find_bracket_pairs(b['ss'], b['seq']))
         names.append(b['name'])
         
-        clus[i] = b['cluster']
+        # clus[i] = b['cluster']
 
     mask = np.isfinite(np.sum(X,(2,3))).astype(np.float32) # atom mask
     numbers = np.sum(mask, axis=1).astype(np.int)
@@ -163,8 +167,8 @@ def featurize_HC_Aug(batch):
 
         indices = np.asarray([alphabet.index(a) for a in b['seq']], dtype=np.int32)
         S[i, :l] = indices
-        ss_pos[i, :l] = np.asarray([1 if ss_val!='.' else 0 for ss_val in b['ss']], dtype=np.int32)
-        ss_pair.append(find_bracket_pairs(b['ss'], b['seq']))
+        # ss_pos[i, :l] = np.asarray([1 if ss_val!='.' else 0 for ss_val in b['ss']], dtype=np.int32)
+        # ss_pair.append(find_bracket_pairs(b['ss'], b['seq']))
         names.append(b['name'])
 
         clus[i] = b['cluster']
