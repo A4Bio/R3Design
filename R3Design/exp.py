@@ -15,6 +15,19 @@ from constants import method_maps
 from API import Recorder
 from utils import *
 
+import wandb
+import logging
+import pickle
+import json
+import torch
+from parsers import create_parser
+
+
+
+from constants import method_maps
+from API import Recorder
+from utils import *
+
 
 class Exp:
     def __init__(self, args):
@@ -57,6 +70,7 @@ class Exp:
         self._build_method()
 
     def _build_method(self):
+        # steps_per_epoch = len(self.train_loader)
         steps_per_epoch = 1
         self.method = method_maps[self.args.method](self.args, self.device, steps_per_epoch)
 
@@ -98,3 +112,21 @@ class Exp:
         test_perplexity, test_recovery = self.method.test_one_epoch(self.test_loader)
         print_log('Test Perp: {0:.4f}, Test Rec: {1:.4f}\n'.format(test_perplexity, test_recovery))
         return test_perplexity, test_recovery
+    
+if __name__ == '__main__':
+    args = create_parser()
+    config = args.__dict__
+
+    
+    # default_params = load_config(osp.join('./configs', args.method + '.py' if args.config_file is None else args.config_file))
+    # config.update(default_params)
+
+    exp = Exp(args)
+
+    print('>>>>>>>>>>>>>>>>>>>>>>>>>> training <<<<<<<<<<<<<<<<<<<<<<<<<<')
+    exp.train()
+    print('>>>>>>>>>>>>>>>>>>>>>>>>>> testing  <<<<<<<<<<<<<<<<<<<<<<<<<<')
+    test_perp, test_rec = exp.test()
+
+    if args.wandb:
+        wandb.finish()
