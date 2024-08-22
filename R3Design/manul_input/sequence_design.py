@@ -174,7 +174,7 @@ def eval_sequence(processed_data):
     pre_base_pairs = {0: 1, 1: 0, 2: 3, 3: 2}
     pre_great_pairs = ((0, 1), (1, 0), (2, 3), (3, 2))
 
-    svpath = osp.join(root_dir,'ckpt_path/')
+    svpath = osp.join(root_dir,'R3Design/checkpoints/')
     config = json.load(open(svpath+'model_param.json','r'))
     args = argparse.Namespace(**config)
     print(args)
