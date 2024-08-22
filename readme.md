@@ -1,4 +1,5 @@
 # R3Design
+<a href="https://colab.research.google.com/drive/1tAoUHY6w8WeweByY7TFwIyXPyGXA4lMW#scrollTo=gzAKWozrYdag" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 ## Introduction
 
@@ -97,6 +98,12 @@ python secondary_generation.py <'path to PDB file'> <'chain_name'>
 ```
 
 * Sequence design and evaluation
+
+We also provided an implementation for sequence design in Colab, the model is trained on full RNAsolo dataset. Feel free to check out here:
+
+<a href="https://colab.research.google.com/drive/1tAoUHY6w8WeweByY7TFwIyXPyGXA4lMW#scrollTo=gzAKWozrYdag" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+
 ```shell
 ## This program aims to generate RNA sequence using pre-trained R3Design model, based on the input of given PDB file. 
 ## Our R3Design model can only solve the single-chain RNA molecule, if the input PDB file has multiple chains, the system will use the first chain.
