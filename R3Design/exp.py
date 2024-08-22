@@ -36,7 +36,7 @@ class Exp:
         self.device = self._acquire_device()
         self.total_step = 0
         self._preparation()
-        print_log(output_namespace(self.args))
+        # print_log(output_namespace(self.args))
     
     def _acquire_device(self):
         if self.args.use_gpu:
