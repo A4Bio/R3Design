@@ -194,7 +194,7 @@ def print_results(single_data, name_lst, f1, rec_lst, S_preds_lst, S_trues_lst):
     else:
         print('F1_Score:', np.mean(f1), 'Recovery:', np.mean(rec_lst))
 
-def inference(single_data='True', pdb_file=None, dataset='test', chain_name=None):
+def inference(exp, single_data='True', pdb_file=None, dataset='test', chain_name=None):
     processed_data = load_processed_data(single_data, pdb_file, dataset, chain_name)
 
     if single_data == "True" and pdb_file:
