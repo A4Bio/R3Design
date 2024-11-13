@@ -16,7 +16,7 @@ def load_data(data_name, method, batch_size, data_root, max_nodes=3000, num_work
         train_loader = DataLoader_GTrans(train_set, batch_size=batch_size, shuffle=True, num_workers=num_workers, collate_fn=featurize_GTrans)
         valid_loader = DataLoader_GTrans(valid_set, batch_size=batch_size, shuffle=False, num_workers=num_workers, collate_fn=featurize_GTrans)
         test_loader = DataLoader_GTrans(test_set, batch_size=batch_size, shuffle=False, num_workers=num_workers, collate_fn=featurize_GTrans)
-    elif method == 'HCGNN':
+    elif method == 'R3Design':
         dataset = AugDataset(data_root, mode='train')
         train_set, valid_set, test_set = map(lambda x: copy.deepcopy(x), [dataset] * 3)
         valid_set.change_mode('val')

@@ -142,7 +142,15 @@ python system_pipeline.py <'path to PDB file'>
 ```
 The logfile could be found at `R3Design/manul_input/full_result`. The logfile is `log.txt`, the predicted PDB file is inside the `RNA_name_pred` folder `eg: native_pred`.
 
+##  Training from Scartch
 
+Our tool could be trained from sctrach with simple commands. From the initial parameters, please refer to `parsers.py` in the `./R3Design` folder.
+```shell
+## For training, you could simply type: 
+cd R3Design
+python train.py 
+
+```
 ## License
 
 This project is released under the [Apache 2.0 license](LICENSE). See `LICENSE` for more information.
