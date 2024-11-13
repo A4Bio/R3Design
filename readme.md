@@ -146,9 +146,12 @@ python system_pipeline.py <'path to PDB file'>
 ```
 The logfile could be found at `R3Design/manul_input/full_result`. The logfile is `log.txt`, the predicted PDB file is inside the `RNA_name_pred` folder `eg: native_pred`.
 
-##  Training from Scartch
+##  Training from Scartch 
 
 Our tool could be trained from sctrach with simple commands. From the initial parameters, please refer to `parsers.py` in the `./R3Design` folder.
+
+To train the model, you could create a folder named `dataset` under the `R3Design` folder, then, you can copy the [released dataset](https://github.com/A4Bio/R3Design/releases/tag/dataset) into the folder. Then, the model is available for training!
+
 ```shell
 ## For training, you could simply type: 
 cd R3Design
