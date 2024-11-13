@@ -1,6 +1,10 @@
 # R3Design
-<a href="https://colab.research.google.com/drive/1tAoUHY6w8WeweByY7TFwIyXPyGXA4lMW#scrollTo=gzAKWozrYdag" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
+
+**[News 2024-08-21]** We provided an implementation for sequence design in Colab, the model is trained on full RNAsolo dataset. Feel free to check out here:
+
+<a href="https://colab.research.google.com/drive/1tAoUHY6w8WeweByY7TFwIyXPyGXA4lMW#scrollTo=gzAKWozrYdag" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+ 
 ## Introduction
 
 **R3Design** is a comprehensive evaluation system for RNA sequence design and prediction. The core part of R3Design is the sequence design model, a tertiary structure-based RNA sequence design model. In this model, we used Moderna to generate the secondary structure from RNA molecules. After generating the predicted sequence, we used RosettaFold to predict the RNA tertiary structure, which is to test the capability of our predicted sequence folding into the desired sequence. We also provided several APIs for each component of the function.
